@@ -1,0 +1,62 @@
+;
+; KernelDriverTest.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = KernelDriverTest.cat
+DriverVer   = ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+KernelDriverTest.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%KernelDriverTest.DeviceDesc% = KernelDriverTest_Device, Root\KernelDriverTest ; TODO: edit hw-id
+
+[KernelDriverTest_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+KernelDriverTest.sys
+
+;-------------- Service installation
+[KernelDriverTest_Device.NT.Services]
+AddService = KernelDriverTest,%SPSVCINST_ASSOCSERVICE%, KernelDriverTest_Service_Inst
+
+; -------------- KernelDriverTest driver install sections
+[KernelDriverTest_Service_Inst]
+DisplayName    = %KernelDriverTest.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\KernelDriverTest.sys
+
+[KernelDriverTest_Device.NT.Wdf]
+KmdfService = KernelDriverTest, KernelDriverTest_wdfsect
+
+[KernelDriverTest_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "FoxDroid Labs" ;TODO: Replace with your manufacturer name
+DiskName = "KernelDriverTest Installation Disk"
+KernelDriverTest.DeviceDesc = "KernelDriverTest Device"
+KernelDriverTest.SVCDESC = "KernelDriverTest Service"
